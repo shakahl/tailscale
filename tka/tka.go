@@ -12,6 +12,9 @@ import (
 	"fmt"
 	"os"
 	"sort"
+
+	"github.com/fxamacker/cbor/v2"
+	"tailscale.com/types/key"
 )
 
 // Authority is a Tailnet Key Authority. This type is the main coupling
@@ -542,4 +545,19 @@ func (a *Authority) Inform(updates []AUM) error {
 	a.oldestAncestor = c.Oldest
 	a.state = c.state
 	return nil
+}
+
+// NodePermitted checks if the given node key is permitted on this tailnet,
+// as certified by the given serialized node-key signature.
+func (a *Authority) NodePermitted(nodeKey key.NodePublic, nodeKeySignature []byte) error {
+	var decoded NodeKeySignature
+	if err := cbor.Unmarshal(nodeKeySignature, &decoded); err != nil {
+		return fmt.Errorf("unmarshal: %v", err)
+	}
+	key, err := a.state.GetKey(decoded.KeyID)
+	if err != nil {
+		return fmt.Errorf("key: %v", err)
+	}
+
+	return decoded.verifySignature(nodeKey, key)
 }
