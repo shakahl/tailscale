@@ -9,8 +9,9 @@ export async function showLoginURL(url) {
     loginNode.remove()
   }
   loginNode = document.createElement("div")
-  loginNode.className = "login"
+  loginNode.className = "flex flex-col items-center justify-items-center"
   const linkNode = document.createElement("a")
+  linkNode.className = "text-blue-600 hover:underline"
   linkNode.href = url
   linkNode.target = "_blank"
   loginNode.appendChild(linkNode)
@@ -18,16 +19,15 @@ export async function showLoginURL(url) {
   try {
     const dataURL = await QRCode.toDataURL(url, { width: 512 })
     const imageNode = document.createElement("img")
+    imageNode.className = "mx-auto"
     imageNode.src = dataURL
     imageNode.width = 256
     imageNode.height = 256
-    imageNode.border = "0"
     linkNode.appendChild(imageNode)
   } catch (err) {
     console.error("Could not generate QR code:", err)
   }
 
-  linkNode.appendChild(document.createElement("br"))
   linkNode.appendChild(document.createTextNode(url))
 
   document.body.appendChild(loginNode)
@@ -48,7 +48,7 @@ export function showLogoutButton(ipn) {
     logoutButtonNode.remove()
   }
   logoutButtonNode = document.createElement("button")
-  logoutButtonNode.className = "logout"
+  logoutButtonNode.className = "font-bold"
   logoutButtonNode.textContent = "Logout"
   logoutButtonNode.addEventListener(
     "click",
